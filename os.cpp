@@ -2024,41 +2024,41 @@ int ReadComd(int k)		//read命令的处理函数：读文件
 
 /////////////////////////////////////////////////////////////////
 
-int CopyComd(int k)		//copy命令的处理函数：复制文件 
+int CopyComd(int k)		//copy����Ĵ��������������ļ� 
 {
-	// 复制文件：copy <源文件名> [<目标文件名>]
-	// 命令功能：为目标文件建立目录项，分配新的盘块，并将源文件的内容复制到目标文件中
-	// 和其他命令一样，这里的“文件名”，是指最后一个名字是文件的路径名。
-	// 若目标文件与源文件所在的目录相同，则只能进行更名复制，此时目标文件名不能省；
-	// 若目标文件与源文件所在的目录不同，则既可更名复制也可同名复制，同名复制时目标文件名可省。
-	// 例如，命令
+    	// �����ļ���copy <Դ�ļ���> [<Ŀ���ļ���>]
+	// ����ܣ�ΪĿ���ļ�����Ŀ¼������µ��̿飬����Դ�ļ������ݸ��Ƶ�Ŀ���ļ���
+	// ����������һ��������ġ��ļ���������ָ���һ���������ļ���·������
+	// ��Ŀ���ļ���Դ�ļ����ڵ�Ŀ¼��ͬ����ֻ�ܽ��и������ƣ���ʱĿ���ļ�������ʡ��
+	// ��Ŀ���ļ���Դ�ļ����ڵ�Ŀ¼��ͬ����ȿɸ�������Ҳ��ͬ�����ƣ�ͬ������ʱĿ���ļ�����ʡ��
+	// ���磬����
 	//		copy mail email
-	// (1) 若当前目录中不存在email(目录或文件)，则该命令将当前目录中的文件mail，复制成
-	//     当前目录下的文件email;
-	// (2) 若当前目录下存在email，但email是子目录名，则将当前目录中的文件mail，复制到当
-	//     前目录中的email子目录内，文件名与源文件相同(同名复制)；此时若email目录内已经
-	//     存在文件或目录mail，则出现重名错误；
-	// (3) 若当前目录内存在email文件，则出现重名错误；
-	// (4) 若当前目录内不存在源文件mail(或者虽然有mail，但它是子目录名)，则也报错。
-	//【特例】命令中无目标文件时，将源文件同名复制到当前目录中。例如，当前目录为/usr
+	// (1) ����ǰĿ¼�в�����email(Ŀ¼���ļ�)����������ǰĿ¼�е��ļ�mail�����Ƴ�
+	//     ��ǰĿ¼�µ��ļ�email;
+	// (2) ����ǰĿ¼�´���email����email����Ŀ¼�����򽫵�ǰĿ¼�е��ļ�mail�����Ƶ���
+	//     ǰĿ¼�е�email��Ŀ¼�ڣ��ļ�����Դ�ļ���ͬ(ͬ������)����ʱ��emailĿ¼���Ѿ�
+	//     �����ļ���Ŀ¼mail���������������
+	// (3) ����ǰĿ¼�ڴ���email�ļ����������������
+	// (4) ����ǰĿ¼�ڲ�����Դ�ļ�mail(������Ȼ��mail����������Ŀ¼��)����Ҳ������
+	//����������������Ŀ���ļ�ʱ����Դ�ļ�ͬ�����Ƶ���ǰĿ¼�С����磬��ǰĿ¼Ϊ/usr
 	//		copy /box
-	// 则上述命令把根目录中的文件box复制到当前目录/usr中，文件名仍为box。
+	// ����������Ѹ�Ŀ¼�е��ļ�box���Ƶ���ǰĿ¼/usr�У��ļ�����Ϊbox��
 
-	//【注】在同一目录中，各目录项不能重名（不管是文件名还是子目录名）。
+	//��ע����ͬһĿ¼�У���Ŀ¼����������������ļ���������Ŀ¼������
 
-	// 学生还可考虑使用通配符的多文件同名复制的情况(目标文件与源文件所在目录必须不同)。
+	// ѧ�����ɿ���ʹ��ͨ����Ķ��ļ�ͬ�����Ƶ����(Ŀ���ļ���Դ�ļ�����Ŀ¼���벻ͬ)��
 
 	if (k == 2 && is_wildcard_all(comd[1]))
 	{
-		char* dest_path = comd[2];   // copy * 目标目录
+		char* dest_path = comd[2];   // copy * Ŀ��Ŀ¼
 		char attrib = '\0';
 		FCB* dest_fcbp;
 		short dest_dir_block;
 
-		dest_dir_block = FindPath(dest_path, (char)16, 1, dest_fcbp);		// 解析目标路径（必须是目录）
+		dest_dir_block = FindPath(dest_path, (char)16, 1, dest_fcbp);		// ����Ŀ��·����������Ŀ¼��
 		if (dest_dir_block < 1)
 		{
-			cout << "\n目标目录不存在或路径错误。\n";
+			cout << "\nĿ��Ŀ¼�����ڻ�·������\n";
 			return -1;
 		}
 
@@ -2073,46 +2073,46 @@ int CopyComd(int k)		//copy命令的处理函数：复制文件
 			{
 				if (src_fcbp->FileName[0] == '\0' || src_fcbp->FileName[0] == (char)0xe5)
 					continue;
-				if (src_fcbp->Fattrib >= 16) // 跳过子目录
+				if (src_fcbp->Fattrib >= 16) // ������Ŀ¼
 					continue;
 
-				strcpy(temppath, curpath.cpath);				// 构造源文件全路径用于检查是否打开
+				strcpy(temppath, curpath.cpath);				// ����Դ�ļ�ȫ·�����ڼ���Ƿ��
 				if (temppath[strlen(temppath) - 1] != '/') strcat(temppath, "/");
 				strcat(temppath, src_fcbp->FileName);
 				if (Check_UOF(temppath) < S)
 				{
-					cout << "\n文件 " << src_fcbp->FileName << " 正在打开，跳过复制。\n";
+					cout << "\n�ļ� " << src_fcbp->FileName << " ���ڴ򿪣��������ơ�\n";
 					continue;
 				}
 
-				short exist = FindFCB(src_fcbp->FileName, dest_dir_block, '\0', dest_fcbp);				// 检查目标目录中是否已有同名文件
+				short exist = FindFCB(src_fcbp->FileName, dest_dir_block, '\0', dest_fcbp);				// ���Ŀ��Ŀ¼���Ƿ�����ͬ���ļ�
 				if (exist >= 0)
 				{
-					cout << "\n目标目录中已存在 " << src_fcbp->FileName << "，跳过。\n";
+					cout << "\nĿ��Ŀ¼���Ѵ��� " << src_fcbp->FileName << "��������\n";
 					continue;
 				}
 
-				FCB* new_fcbp;				// 在目标目录找空目录项
+				FCB* new_fcbp;				// ��Ŀ��Ŀ¼�ҿ�Ŀ¼��
 				if (FindBlankFCB(dest_dir_block, new_fcbp) < 0)
 				{
-					cout << "\n目标目录已满，停止复制。\n";
+					cout << "\nĿ��Ŀ¼������ֹͣ���ơ�\n";
 					cout << copied << " file(s) copied\n";
 					return 1;
 				}
 
-				int size = src_fcbp->Fsize;				// 计算所需盘块数
+				int size = src_fcbp->Fsize;				// ���������̿���
 				int blocks_needed = size / SIZE + (size % SIZE > 0);
 				if (FAT[0] < blocks_needed)
 				{
-					cout << "\n磁盘空间不足，停止复制。\n";
+					cout << "\n���̿ռ䲻�㣬ֹͣ���ơ�\n";
 					cout << copied << " file(s) copied\n";
 					return 1;
 				}
 
-				// 复制目录项
-				*new_fcbp = *src_fcbp;  // 复制整个FCB
+				// ����Ŀ¼��
+				*new_fcbp = *src_fcbp;  // ��������FCB
 
-				short old_head = src_fcbp->Addr;				// 复制文件内容
+				short old_head = src_fcbp->Addr;				// �����ļ�����
 				short prev = 0;
 				short curr = 0;
 
@@ -2139,107 +2139,164 @@ int CopyComd(int k)		//copy命令的处理函数：复制文件
 		return 1;
 	}
 
-	short int i, size, s01, s02, s1, s2, s22, b, b0, bnum;
+
+	short int i, size, s01, s02, s1, s2, b, b0, bnum;
 	char attrib = '\0', * FileName1, * FileName2;
-	char gFileName[PATH_LEN];	//存放文件全路径名
+	char gFileName[PATH_LEN];	//����ļ�ȫ·����
 	FCB* fcbp, * fcbp1, * fcbp2;
-	if (k < 1 || k>2)
+
+	if (k < 1 || k > 2)
 	{
-		cout << "\n命令中参数太多或太少。\n";
+		cout << "\n�����в���̫���̫�١�\n";
 		return -1;
 	}
-	s01 = ProcessPath(comd[1], FileName1, k, 0, '\20');//取FileName所在目录的首块号
-	if (s01 < 1)			//路径错误
-		return s01;		//失败，返回
-	s1 = FindFCB(FileName1, s01, attrib, fcbp);	//取FileName(源文件)的首块号(查其存在性)
+
+
+	s01 = ProcessPath(comd[1], FileName1, k, 0, '\20');//ȡFileName����Ŀ¼���׿��
+	if (s01 < 1)			//·������
+		return s01;		//ʧ�ܣ�����
+
+	s1 = FindFCB(FileName1, s01, attrib, fcbp); //ȡFileName(Դ�ļ�)���׿��(���������)
 	if (s1 < 0)
 	{
-		cout << "\n要复制的文件不存在。\n";
+		cout << "\nҪ���Ƶ��ļ������ڡ�\n";
 		return -1;
 	}
-	fcbp1 = fcbp;			//记下源文件目录项指针值
+	fcbp1 = fcbp;			//����Դ�ļ�Ŀ¼��ָ��ֵ
+
+	// ���Դ�ļ��Ƿ񱻴�
 	strcpy(gFileName, temppath);
 	i = strlen(temppath);
 	if (temppath[i - 1] != '/')
 		strcat(gFileName, "/");
-	strcat(gFileName, FileName1);	//构造文件的全路径名
-	i = Check_UOF(gFileName);			//查UOF
-	if (i < S)						//该文件已在UOF中
+	strcat(gFileName, FileName1);	//�����ļ���ȫ·����
+	i = Check_UOF(gFileName);
+	if (i < S)						//���ļ�����UOF��
 	{
-		cout << "\n文件" << gFileName << "已经打开，不能复制!\n";
+		cout << "\n�ļ�" << gFileName << "�Ѿ��򿪣����ܸ���!\n";
 		return -2;
 	}
-	if (k == 1)		//命令中无目标文件,同名复制到当前目录
+
+ 
+	if (k == 1)		//��������Ŀ���ļ�,ͬ�����Ƶ���ǰĿ¼
 	{
-		s02 = curpath.fblock;	//取当前目录的首块号
+		s02 = curpath.fblock;
 		FileName2 = FileName1;
 	}
-	else	//k=2(命令中提供目标文件)的情况
+	else	// k=2(�������ṩĿ���ļ�)�����
 	{
-		s02 = ProcessPath(comd[2], FileName2, k, 0, '\20');//取FileName2所在目录的首块号
-		if (s02 < 1)			//目标路径错误
-			return s02;
-	}
-	if (!IsName(FileName2))		//若名字不符合规则
-	{
-		cout << "\n命令中的目标文件名错误。\n";
-		return -2;
-	}
-	s2 = FindFCB(FileName2, s02, '\040', fcbp);	//取FileName2(目标文件)的首块号(查其存在性)
-	if (s2 >= 0 && fcbp->Fattrib <= '\07')	//存在同名目标文件
-	{
-		cout << "\n存在文件与目标文件同名。\n";
-		return -3;
-	}
-	if (s2 < 0)		//FileName2尚不存在，在s02为首块号的目录内复制目标文件
-		s22 = s02;
-	else			//FileName2存在，但它是目录名
-	{
-		s22 = s2;
-		if (s2 != s01)		//源文件与目标文件不同目录
+		FCB* dir_fcb_temp;
+		short dir_block = FindPath(comd[2], (char)0x10, 1, dir_fcb_temp);    // 0x10 ��ʾĿ¼����
+
+		if (dir_block > 0) 
 		{
-			b = FindFCB(FileName1, s2, attrib, fcbp);//需查FileName2目录中有没有文件FileName1
-			if (b >= 0)
+			s02 = dir_block;        // Ŀ��Ŀ¼�������Ŀ¼
+			FileName2 = FileName1;  // Ŀ���ļ���Ĭ����Դ�ļ���ͬ
+		}
+		else 
+		{
+			s02 = ProcessPath(comd[2], FileName2, k, 0, '\20');
+			if (s02 < 1) return s02; // Ŀ��·������
+
+			if (!IsName(FileName2))	// �����ֲ����Ϲ���
 			{
-				cout << "\n有同名文件，不能复制。\n";
-				return -4;
+				cout << "\n�����е�Ŀ���ļ�������\n";
+				return -2;
 			}
-			FileName2 = FileName1;	//缺省目标文件名，同名复制
-		}
-		else
-		{
-			cout << "\n不能同目录同名复制。\n";
-			return -5;
 		}
 	}
-	i = FindBlankFCB(s22, fcbp2);
-	if (i < 0)
+
+	// ��鲻��ͬĿ¼ͬ������ (ԴĿ¼���==Ŀ��Ŀ¼��� �� �ļ�����ͬ)
+	if (s01 == s02 && strcmp(FileName1, FileName2) == 0)
 	{
-		cout << "\n复制文件失败。\n";
-		return i;
+		cout << "\n����ͬĿ¼ͬ�����ơ�\n";
+		return -5;
 	}
-	size = fcbp1->Fsize;		//源文件的长度
-	bnum = size / SIZE + (short)(size % SIZE > 0);	//计算源文件所占盘块数
+
+
+	s2 = FindFCB(FileName2, s02, '\040', fcbp); // ����Ŀ��Ŀ¼���Ƿ���ͬ����
+
+	if (s2 >= 0) 
+	{
+		// --- Ŀ���Ѵ��� ---
+		if (fcbp->Fattrib >= 16) // ���ͬ��������Ŀ¼ (����ֵ>=16)
+		{
+			cout << "\nĿ���ļ�����Ŀ¼ͬ�������ܸ�����Ŀ¼��\n"; 
+			return -3;
+		}
+		else 
+		{
+			// ���ͬ�������ļ� -> ѯ�ʸ���
+			cout << "\n�����ļ���Ŀ���ļ�ͬ�����Ƿ�Ҫ��������(y/n) ";
+			char ans;
+			cin >> ans;
+			if (ans == 'y' || ans == 'Y')
+			{
+				// ִ�и��ǲ���������ԭ�ļ����̿�
+				short next_block = fcbp->Addr;
+				while (next_block > 0)
+				{
+					short temp = FAT[next_block];
+					FAT[next_block] = 0; // ���FAT��������̿�
+					next_block = temp;
+				}
+				fcbp->Addr = 0;  // �����׿��
+				fcbp->Fsize = 0; // ���ô�С
+				fcbp2 = fcbp;    // ��Ŀ��ָ��ָ������ɵ�(�������)FCB��׼������
+			}
+			else
+			{
+				return 0; // �û�ѡ�񲻸��ǣ�ȡ������
+			}
+		}
+	}
+	else 
+	{
+		// --- Ŀ�겻���� ---
+		// ��Ŀ¼ s02 ��Ѱ��һ�����е� FCB
+		i = FindBlankFCB(s02, fcbp2);
+		if (i < 0)
+		{
+			cout << "\nĿ��Ŀ¼�������޷����ơ�\n";
+			return i;
+		}
+	}
+
+
+	size = fcbp1->Fsize;		// Դ�ļ��ĳ���
+	bnum = size / SIZE + (short)(size % SIZE > 0); // ����Դ�ļ���ռ�̿���
+
 	if (FAT[0] < bnum)
 	{
-		cout << "\n磁盘空间已满，不能复制文件。\n";
+		cout << "\n���̿ռ����������ܸ����ļ���\n";
 		return -6;
 	}
-	*fcbp2 = *fcbp1;						//源文件的目录项复制给目标文件
-	strcpy(fcbp2->FileName, FileName2);	//写目标文件名
+
+	// ��������
+	*fcbp2 = *fcbp1;						// Դ�ļ���Ŀ¼��Ƹ�Ŀ���ļ�
+	strcpy(fcbp2->FileName, FileName2);	    // ����Ŀ���ļ��� (fcbp1����Դ�ļ���)
+	
+
+
 	b0 = 0;
-	while (s1 > 0)		//开始复制文件内容
+	s1 = fcbp1->Addr; // ��ȡԴ�ļ��׿��
+       
+	while (s1 > 0)		// ��ʼ�����ļ�����
 	{
-		b = getblock();
+		b = getblock(); // �������̿�
 		if (b0 == 0)
-			fcbp2->Addr = b;		//目标文件的首块号
+			fcbp2->Addr = b;		// ����ǵ�һ�飬д��FCB���׿��
 		else
-			FAT[b0] = b;
-		memcpy(Disk[b], Disk[s1], SIZE);	//复制盘块
-		s1 = FAT[s1];				//准备复制下一个盘块
+			FAT[b0] = b;            // ��������FAT��
+
+		memcpy(Disk[b], Disk[s1], SIZE); // ���������̿�����
+
+		s1 = FAT[s1];				// ׼��������һ���̿�
 		b0 = b;
 	}
-	return 1;					//文件复制成功，返回
+    FAT[b0] = -1; // �ļ�β���
+
+	return 1; // �ļ����Ƴɹ�������
 }
 
 /////////////////////////////////////////////////////////////////
